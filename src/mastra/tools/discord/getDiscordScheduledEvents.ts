@@ -1,5 +1,6 @@
 import { createTool } from '@mastra/core/tools';
 import { z } from "zod";
+import { getDiscordApiRequest } from './discordApiRequest';
 
 /**
  * スケジュールイベントのスキーマ
@@ -76,13 +77,7 @@ export const getDiscordScheduledEventsTool = createTool({
 });
 
 const getDiscordScheduledEvents = async (guildId: string) => {
-  const url = `https://discord.com/api/v10/guilds/${guildId}/scheduled-events`;
-  const response = await fetch(url, {
-    headers: {
-      'Authorization': `Bot ${process.env.DISCORD_BOT_TOKEN}`,
-    },
-  });
-  const data = await response.json();
+  const data = await getDiscordApiRequest(`guilds/${guildId}/scheduled-events`);
 
   return data;
 };

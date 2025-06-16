@@ -1,42 +1,28 @@
 import { google } from '../models';
 import { Agent } from '@mastra/core/agent';
-import { getDiscordScheduledEventsTool } from '../tools/discord/getDiscordScheduledEvents';
 import { memory } from '../memory';
+import { getDiscordScheduledEventsTool, getDiscordGuildsTool, getDiscordGuildTool } from '../tools/discord';
 
 export const discordAgent = new Agent({
   name: 'Discord Agent',
   instructions: `
-      あなたはDiscordのスケジュールイベントを管理するアシスタントです。
+      あなたはDiscordの運営を管理するアシスタントです。
 
-      主な役割は、Discordのスケジュールイベントを管理することです。応答時のルール：
-      - サーバーのIDが指定されていない場合は、サーバーのIDを尋ねてください。
-      - 繰り返しイベントがキャンセルされている場合は、繰り返し条件から活動日を計算してください。
-        - 計算結果は求められない限り出力や言及する必要はありません。
-      - 日時を出力する場合は、日本時間でYYYY/MM/DD HH:MMの形式で出力してください。
-      - 出力形式はMarkdownでユーザーにわかりやすいようにしてください。
-      - 出力に具体的なデータ構造によるプロパティ名は不要です。ユーザーにわかりやすい名称で伝えてください。
-
-      getDiscordScheduledEventsToolを使ってDiscordのスケジュールイベントを取得してください。
-      このツールで取得できるデータは以下のようなものです。
-      - イベントの基本情報
-      - 作成者の情報
-      - 繰り返しのルール
-      - イベントの場所
+      主な役割は、Discordの運営を管理することです。応答時のルール：
+      - サーバー名が指定された場合は、getDiscordGuildsToolを使ってサーバーIDを取得してください。
+        - サーバー名が指定されていない場合は、サーバー名を尋ねてください。
+        - サーバー名が指定された場合は、聞き返さずにgetDiscordGuildsToolを使ってサーバーIDを取得してください。
+      - サーバーの詳細を尋ねられた場合は、getDiscordGuildToolを使ってサーバーの詳細を取得してください。
+        - サーバーのスケジュールを尋ねられた場合は、getDiscordScheduledEventsToolを使ってサーバーのスケジュールイベントを取得してください。
+        - 繰り返しイベントに例外がある場合は、例外を除いたイベント日程を計算してください。
+      - サーバーの情報を取得した場合は、memoryに保存してください。
+      - ※updateWorkingMemoryを行ったときに、絶対に繰り返さないでください。
   `,
   model: google('gemini-2.0-flash'),
-  tools: { getDiscordScheduledEventsTool },
+  tools: { getDiscordScheduledEventsTool, getDiscordGuildsTool, getDiscordGuildTool },
   memory: memory(`
     ## Guild
-    - Guild ID
-    
-    ## Scheduled Event
-    - Event Title
-    - Event Description
-    - Event Start Time
-    - Event End Time
-    - Event Location
-    - Event Creator
-    - Event Recurrence Rule
-    - Event Recurrence Exception
+    - Guild ID: サーバーのID
+    - Guild Name: サーバーの名前
   `),
 });
