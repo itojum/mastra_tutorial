@@ -1,4 +1,4 @@
-import { google } from '@ai-sdk/google';
+import { google } from '../models';
 import { Agent } from '@mastra/core/agent';
 import { Memory } from '@mastra/memory';
 import { LibSQLStore } from '@mastra/libsql';
